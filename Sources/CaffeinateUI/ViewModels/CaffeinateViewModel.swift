@@ -63,7 +63,7 @@ final class CaffeinateViewModel {
         let flags = activeFlags
         guard !flags.isEmpty else { return nil }
         var parts = ["caffeinate"] + flags.map(\.rawValue)
-        if let timeout = selectedTimeout.seconds(customSeconds: customTimeoutSeconds) {
+        if let timeout = resolveTimeout(flags: flags) {
             parts += ["-t", "\(timeout)"]
         }
         return parts.joined(separator: " ")
@@ -184,11 +184,9 @@ final class CaffeinateViewModel {
         service.start(flags: flags, timeout: timeout)
         isActive = true
 
-        // Only show countdown for user-chosen timeouts, not the internal -u override
-        let userTimeout = selectedTimeout.seconds(customSeconds: customTimeoutSeconds)
-        if let userTimeout {
-            remainingSeconds = userTimeout
-            totalTimeoutSeconds = userTimeout
+        if let timeout {
+            remainingSeconds = timeout
+            totalTimeoutSeconds = timeout
             timeoutStartDate = Date()
             timeoutProgress = 1
             startCountdown()

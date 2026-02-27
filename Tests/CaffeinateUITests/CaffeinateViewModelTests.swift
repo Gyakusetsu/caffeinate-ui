@@ -51,6 +51,12 @@ final class CaffeinateViewModelTests: XCTestCase {
         XCTAssertEqual(vm.commandString, "caffeinate -d")
     }
 
+    func testCommandStringDeclareUserActiveIndefiniteShows8HourTimeout() {
+        vm.enabledFlags = [.declareUserActive: true]
+        vm.selectedTimeout = .indefinite
+        XCTAssertEqual(vm.commandString, "caffeinate -u -t 28800")
+    }
+
     func testCommandStringCustomTimeout() {
         vm.enabledFlags = [.preventIdleSleep: true]
         vm.selectedTimeout = .custom
@@ -187,6 +193,15 @@ final class CaffeinateViewModelTests: XCTestCase {
         binding.wrappedValue = true
 
         XCTAssertEqual(vm.timeoutProgress, 0)
+    }
+
+    func testTimeoutProgressNonZeroWhenDeclareUserActiveIndefinite() {
+        vm.selectedTimeout = .indefinite
+        let binding = vm.binding(for: .declareUserActive)
+        binding.wrappedValue = true
+
+        XCTAssertEqual(vm.totalTimeoutSeconds, 8 * 60 * 60)
+        XCTAssertEqual(vm.timeoutProgress, 1.0, accuracy: 0.01)
     }
 
     func testTimeoutProgressZeroWhenInactive() {
