@@ -1,4 +1,4 @@
-enum TimeoutOption: Hashable, CaseIterable, Identifiable {
+enum TimeoutOption: String, Hashable, CaseIterable, Identifiable, Codable {
     case minutes15
     case minutes30
     case hours1

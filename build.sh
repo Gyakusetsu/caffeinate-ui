@@ -16,5 +16,10 @@ mkdir -p "${MACOS_DIR}"
 cp .build/release/CaffeinateUI "${MACOS_DIR}/CaffeinateUI"
 cp Resources/Info.plist "${CONTENTS_DIR}/Info.plist"
 
-echo "Built: ${BUNDLE_DIR}"
-echo "Run with: open \"${BUNDLE_DIR}\""
+INSTALL_DIR="/Applications/${APP_NAME}.app"
+echo "Installing to ${INSTALL_DIR}..."
+rm -rf "${INSTALL_DIR}"
+cp -R "${BUNDLE_DIR}" "${INSTALL_DIR}"
+
+echo "Installed: ${INSTALL_DIR}"
+echo "Run with: open \"${INSTALL_DIR}\""

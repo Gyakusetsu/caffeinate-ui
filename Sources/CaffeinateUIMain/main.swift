@@ -1,0 +1,3 @@
+import CaffeinateCore
+
+CaffeinateUIApp.main()

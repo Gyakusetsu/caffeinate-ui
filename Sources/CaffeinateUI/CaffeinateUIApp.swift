@@ -1,14 +1,13 @@
 import SwiftUI
 
-@main
-struct CaffeinateUIApp: App {
+public struct CaffeinateUIApp: App {
     @State private var viewModel = CaffeinateViewModel()
 
-    init() {
+    public init() {
         SingleInstance.acquire()
     }
 
-    var body: some Scene {
+    public var body: some Scene {
         MenuBarExtra {
             CaffeinatePanel(viewModel: viewModel)
         } label: {

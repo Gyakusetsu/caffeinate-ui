@@ -1,6 +1,13 @@
 import Foundation
 
-final class CaffeinateService {
+protocol CaffeinateServiceProtocol: AnyObject {
+    var onTermination: (() -> Void)? { get set }
+    func start(flags: [CaffeinateFlag], timeout: Int?)
+    func killAll()
+    func stop()
+}
+
+final class CaffeinateService: CaffeinateServiceProtocol {
     private var process: Process?
     var onTermination: (() -> Void)?
 
@@ -46,6 +53,7 @@ final class CaffeinateService {
         task.executableURL = URL(fileURLWithPath: "/usr/bin/pkill")
         task.arguments = ["-x", "caffeinate"]
         try? task.run()
+        task.waitUntilExit()
     }
 
     func stop() {

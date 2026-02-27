@@ -1,4 +1,4 @@
-enum CaffeinateFlag: String, CaseIterable, Identifiable {
+enum CaffeinateFlag: String, CaseIterable, Identifiable, Codable {
     case preventDisplaySleep = "-d"
     case preventIdleSleep = "-i"
     case preventSystemSleep = "-s"

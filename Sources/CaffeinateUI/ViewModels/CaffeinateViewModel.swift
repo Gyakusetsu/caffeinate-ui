@@ -1,15 +1,51 @@
+import ServiceManagement
 import SwiftUI
 
 @Observable
 final class CaffeinateViewModel {
     var enabledFlags: [CaffeinateFlag: Bool] = [:]
-    var selectedTimeout: TimeoutOption = .indefinite { didSet { if isActive { syncProcess() } } }
-    var customTimeoutSeconds: Int = 600 { didSet { if isActive { syncProcess() } } }
+    var selectedTimeout: TimeoutOption = .indefinite {
+        didSet {
+            guard !isRestoring else { return }
+            saveState()
+            if isActive { syncProcess() }
+        }
+    }
+    var customTimeoutSeconds: Int = 600 {
+        didSet {
+            guard !isRestoring else { return }
+            saveState()
+            if isActive { syncProcess() }
+        }
+    }
     var remainingSeconds: Int = 0
     private(set) var isActive: Bool = false
 
-    private let service = CaffeinateService()
+    var launchAtLogin: Bool {
+        get { SMAppService.mainApp.status == .enabled }
+        set {
+            do {
+                if newValue {
+                    try SMAppService.mainApp.register()
+                } else {
+                    try SMAppService.mainApp.unregister()
+                }
+            } catch {
+                // Registration can fail if user denies in System Settings
+            }
+        }
+    }
+
+    private let service: CaffeinateServiceProtocol
+    private let defaults: UserDefaultsProtocol
     private var countdownTimer: Timer?
+    private var isRestoring = false
+
+    private enum Keys {
+        static let enabledFlags = "enabledFlags"
+        static let selectedTimeout = "selectedTimeout"
+        static let customTimeoutSeconds = "customTimeoutSeconds"
+    }
 
     var iconName: String {
         isActive ? "cup.and.saucer.fill" : "cup.and.saucer"
@@ -29,7 +65,12 @@ final class CaffeinateViewModel {
         return parts.joined(separator: " ")
     }
 
-    init() {
+    init(
+        service: CaffeinateServiceProtocol = CaffeinateService(),
+        defaults: UserDefaultsProtocol = UserDefaults.standard
+    ) {
+        self.service = service
+        self.defaults = defaults
         service.killAll()
 
         service.onTermination = { [weak self] in
@@ -45,6 +86,8 @@ final class CaffeinateViewModel {
         ) { [weak self] _ in
             self?.service.stop()
         }
+
+        restoreState()
     }
 
     func binding(for flag: CaffeinateFlag) -> Binding<Bool> {
@@ -53,8 +96,17 @@ final class CaffeinateViewModel {
             set: { newValue in
                 self.enabledFlags[flag] = newValue
                 self.syncProcess()
+                self.saveState()
             }
         )
+    }
+
+    func toggleAllFlags(_ enabled: Bool) {
+        for flag in CaffeinateFlag.allCases {
+            enabledFlags[flag] = enabled
+        }
+        syncProcess()
+        saveState()
     }
 
     func stopAll() {
@@ -64,6 +116,40 @@ final class CaffeinateViewModel {
         stopCountdown()
         enabledFlags = [:]
         remainingSeconds = 0
+        saveState()
+    }
+
+    // MARK: - Persistence
+
+    private func saveState() {
+        let flagKeys = enabledFlags.compactMap { $0.value ? $0.key : nil }
+        if let data = try? JSONEncoder().encode(flagKeys) {
+            defaults.set(data, forKey: Keys.enabledFlags)
+        }
+        defaults.set(selectedTimeout.rawValue, forKey: Keys.selectedTimeout)
+        defaults.set(customTimeoutSeconds, forKey: Keys.customTimeoutSeconds)
+    }
+
+    private func restoreState() {
+        isRestoring = true
+        defer { isRestoring = false }
+
+        if let data = defaults.data(forKey: Keys.enabledFlags),
+           let flags = try? JSONDecoder().decode([CaffeinateFlag].self, from: data) {
+            for flag in flags {
+                enabledFlags[flag] = true
+            }
+        }
+
+        if let raw = defaults.string(forKey: Keys.selectedTimeout),
+           let timeout = TimeoutOption(rawValue: raw) {
+            selectedTimeout = timeout
+        }
+
+        let saved = defaults.integer(forKey: Keys.customTimeoutSeconds)
+        if saved > 0 {
+            customTimeoutSeconds = saved
+        }
     }
 
     // MARK: - Private

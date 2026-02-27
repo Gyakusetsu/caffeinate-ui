@@ -17,7 +17,13 @@ struct CaffeinatePanel: View {
 
             Divider()
 
-            // Flag toggles
+            // Master toggle + flag toggles
+            Toggle("Enable All", isOn: Binding(
+                get: { CaffeinateFlag.allCases.allSatisfy { self.viewModel.enabledFlags[$0] == true } },
+                set: { viewModel.toggleAllFlags($0) }
+            ))
+            .toggleStyle(.checkbox)
+
             ForEach(CaffeinateFlag.allCases) { flag in
                 FlagToggleRow(
                     flag: flag,
@@ -65,6 +71,12 @@ struct CaffeinatePanel: View {
                     NSApp.terminate(nil)
                 }
             }
+
+            Toggle("Launch at Login", isOn: Binding(
+                get: { viewModel.launchAtLogin },
+                set: { viewModel.launchAtLogin = $0 }
+            ))
+            .toggleStyle(.checkbox)
 
             Divider()
 

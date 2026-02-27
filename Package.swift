@@ -8,9 +8,14 @@ let package = Package(
         .macOS(.v14)
     ],
     targets: [
+        .target(
+            name: "CaffeinateCore",
+            path: "Sources/CaffeinateUI"
+        ),
         .executableTarget(
             name: "CaffeinateUI",
-            path: "Sources/CaffeinateUI",
+            dependencies: ["CaffeinateCore"],
+            path: "Sources/CaffeinateUIMain",
             linkerSettings: [
                 .unsafeFlags([
                     "-Xlinker", "-sectcreate",
@@ -19,6 +24,10 @@ let package = Package(
                     "-Xlinker", "Resources/Info.plist"
                 ])
             ]
+        ),
+        .testTarget(
+            name: "CaffeinateUITests",
+            dependencies: ["CaffeinateCore"]
         )
     ]
 )
