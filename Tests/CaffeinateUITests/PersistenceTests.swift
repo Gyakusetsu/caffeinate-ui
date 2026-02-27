@@ -59,7 +59,7 @@ final class PersistenceTests: XCTestCase {
         XCTAssertEqual(vm.customTimeoutSeconds, 999)
     }
 
-    func testRestoredStateDoesNotStartCaffeinating() {
+    func testRestoredStateResumesCaffeinating() {
         let defaults = MockUserDefaults()
         let flagData = try! JSONEncoder().encode([CaffeinateFlag.preventDisplaySleep])
         defaults.set(flagData, forKey: "enabledFlags")
@@ -67,9 +67,9 @@ final class PersistenceTests: XCTestCase {
         let mock = MockCaffeinateService()
         let vm = CaffeinateViewModel(service: mock, defaults: defaults)
 
-        XCTAssertFalse(vm.isActive)
-        // killAll is called once in init, but start should never be called
-        XCTAssertEqual(mock.startCallCount, 0)
+        XCTAssertTrue(vm.isActive)
+        XCTAssertEqual(mock.startCallCount, 1)
+        XCTAssertEqual(mock.lastStartFlags, [.preventDisplaySleep])
     }
 
     // MARK: - stopAll clears persisted flags

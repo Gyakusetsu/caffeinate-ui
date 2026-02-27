@@ -89,6 +89,7 @@ final class CaffeinateViewModel {
         }
 
         restoreState()
+        syncProcess()
     }
 
     func binding(for flag: CaffeinateFlag) -> Binding<Bool> {
