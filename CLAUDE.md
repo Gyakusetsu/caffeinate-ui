@@ -27,7 +27,7 @@ macOS menu bar app providing a GUI for the `caffeinate` command.
 ## Testing
 - XCTest with `@testable import CaffeinateCore`
 - `MockCaffeinateService` and `MockUserDefaults` (test spies in `TestHelpers.swift`) — no real processes or UserDefaults
-- `PersistenceTests` verifies save/restore cycle, corrupted-data resilience, and that restore does not auto-start caffeinating
+- `PersistenceTests` verifies save/restore cycle, corrupted-data resilience, and that restored flags resume caffeinating on next launch
 - `formatDuration(_:)` extracted as free function for independent testing
 - Run: `swift test`
 
@@ -39,7 +39,7 @@ macOS menu bar app providing a GUI for the `caffeinate` command.
 - Kills stale caffeinate processes on launch; `killAll()` waits for pkill to finish before spawning new process
 - Termination handler uses identity check (`===`) to avoid race conditions on rapid toggle changes
 - State persistence: `isRestoring` flag suppresses `didSet` → `saveState()` during `restoreState()` to avoid cross-property overwrites
-- `restoreState()` sets properties directly (not via bindings) so caffeinate does NOT auto-start on launch
+- `restoreState()` sets properties directly (not via bindings) so `didSet` handlers don't trigger `syncProcess()` during restore; `syncProcess()` is called explicitly after `restoreState()` in `init` to resume the previous session
 - `onTermination` callback clears `enabledFlags` and calls `saveState()` so UI resets when timeout expires naturally; countdown timer also clears state when reaching zero to avoid refill flash
 - `totalTimeoutSeconds` tracks the initial timeout; `timeoutProgress` stored var updated every 0.25s from `timeoutStartDate` for smooth drain animation
 - `MenuBarIcon` renders via `NSImage` (not SwiftUI shapes) because `MenuBarExtra` converts labels to template images; uses `isTemplate = true` so the icon adapts to light/dark; `TimelineView` does NOT work in `MenuBarExtra` labels
