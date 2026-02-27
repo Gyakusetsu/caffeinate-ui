@@ -30,7 +30,7 @@ final class CaffeinateViewModel {
     }
 
     init() {
-        killStaleProcesses()
+        service.killAll()
 
         service.onTermination = { [weak self] in
             self?.isActive = false
@@ -59,6 +59,7 @@ final class CaffeinateViewModel {
 
     func stopAll() {
         service.stop()
+        service.killAll()
         isActive = false
         stopCountdown()
         enabledFlags = [:]
@@ -117,14 +118,5 @@ final class CaffeinateViewModel {
     private func stopCountdown() {
         countdownTimer?.invalidate()
         countdownTimer = nil
-    }
-
-    /// Kill any caffeinate processes left over from previous sessions
-    private func killStaleProcesses() {
-        let task = Process()
-        task.executableURL = URL(fileURLWithPath: "/usr/bin/pkill")
-        task.arguments = ["-x", "caffeinate"]
-        try? task.run()
-        task.waitUntilExit()
     }
 }

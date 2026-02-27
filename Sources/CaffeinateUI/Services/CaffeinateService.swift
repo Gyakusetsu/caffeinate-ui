@@ -10,6 +10,7 @@ final class CaffeinateService {
 
     func start(flags: [CaffeinateFlag], timeout: Int?) {
         stop()
+        killAll()
 
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/usr/bin/caffeinate")
@@ -39,13 +40,22 @@ final class CaffeinateService {
         }
     }
 
+    /// Kill all caffeinate processes system-wide so this app is the sole owner.
+    func killAll() {
+        let task = Process()
+        task.executableURL = URL(fileURLWithPath: "/usr/bin/pkill")
+        task.arguments = ["-x", "caffeinate"]
+        try? task.run()
+    }
+
     func stop() {
         guard let process, process.isRunning else {
             self.process = nil
             return
         }
         process.terminate()
-        process.waitUntilExit()
+        // Don't call waitUntilExit() — it pumps the run loop, which allows
+        // re-entrant syncProcess() calls and spawns duplicate processes.
         self.process = nil
     }
 }
