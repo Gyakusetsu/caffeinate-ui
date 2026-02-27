@@ -19,7 +19,13 @@ final class CaffeinateViewModel {
         }
     }
     var remainingSeconds: Int = 0
+    private(set) var totalTimeoutSeconds: Int = 0
     private(set) var isActive: Bool = false
+
+    var timeoutProgress: Double {
+        guard totalTimeoutSeconds > 0 else { return 0 }
+        return Double(remainingSeconds) / Double(totalTimeoutSeconds)
+    }
 
     var launchAtLogin: Bool = SMAppService.mainApp.status == .enabled {
         didSet {
@@ -78,6 +84,9 @@ final class CaffeinateViewModel {
             self?.isActive = false
             self?.stopCountdown()
             self?.remainingSeconds = 0
+            self?.totalTimeoutSeconds = 0
+            self?.enabledFlags = [:]
+            self?.saveState()
         }
 
         NotificationCenter.default.addObserver(
@@ -118,6 +127,7 @@ final class CaffeinateViewModel {
         stopCountdown()
         enabledFlags = [:]
         remainingSeconds = 0
+        totalTimeoutSeconds = 0
         saveState()
     }
 
@@ -163,6 +173,7 @@ final class CaffeinateViewModel {
             isActive = false
             stopCountdown()
             remainingSeconds = 0
+            totalTimeoutSeconds = 0
             return
         }
 
@@ -174,9 +185,11 @@ final class CaffeinateViewModel {
         let userTimeout = selectedTimeout.seconds(customSeconds: customTimeoutSeconds)
         if let userTimeout {
             remainingSeconds = userTimeout
+            totalTimeoutSeconds = userTimeout
             startCountdown()
         } else {
             remainingSeconds = 0
+            totalTimeoutSeconds = 0
             stopCountdown()
         }
     }

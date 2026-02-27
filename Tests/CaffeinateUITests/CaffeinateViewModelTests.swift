@@ -161,6 +161,38 @@ final class CaffeinateViewModelTests: XCTestCase {
         XCTAssertEqual(vm.remainingSeconds, 0)
     }
 
+    func testTerminationCallbackClearsEnabledFlags() {
+        let binding = vm.binding(for: .preventDisplaySleep)
+        binding.wrappedValue = true
+        XCTAssertTrue(vm.enabledFlags[.preventDisplaySleep] == true)
+
+        mock.onTermination?()
+        XCTAssertTrue(vm.enabledFlags.isEmpty)
+    }
+
+    // MARK: - timeoutProgress
+
+    func testTimeoutProgressWithActiveTimed() {
+        vm.selectedTimeout = .minutes15
+        let binding = vm.binding(for: .preventDisplaySleep)
+        binding.wrappedValue = true
+
+        XCTAssertEqual(vm.totalTimeoutSeconds, 900)
+        XCTAssertEqual(vm.timeoutProgress, 1.0, accuracy: 0.001)
+    }
+
+    func testTimeoutProgressZeroWhenIndefinite() {
+        vm.selectedTimeout = .indefinite
+        let binding = vm.binding(for: .preventDisplaySleep)
+        binding.wrappedValue = true
+
+        XCTAssertEqual(vm.timeoutProgress, 0)
+    }
+
+    func testTimeoutProgressZeroWhenInactive() {
+        XCTAssertEqual(vm.timeoutProgress, 0)
+    }
+
     // MARK: - Master toggle
 
     func testToggleAllFlagsEnablesAll() {

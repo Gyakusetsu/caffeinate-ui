@@ -17,6 +17,7 @@ A native macOS menu bar app that provides a GUI for the [`caffeinate`](https://s
 - **Timeout picker** — Preset durations (15m, 30m, 1h, 2h), custom h:m:s input, or indefinite
 - **Live countdown** — Shows remaining time next to the timeout picker
 - **Command display** — Shows the exact `caffeinate` command being run
+- **Progress ring** — Circular arc around the menu bar icon depletes as a timed timeout counts down
 - **Reactive icon** — Menu bar icon changes from outline to filled when active
 - **Single instance** — Only one instance can run at a time (POSIX file lock)
 - **Clean startup** — Kills any stale caffeinate processes from previous sessions
@@ -68,6 +69,7 @@ Sources/
 │   └── Views/
 │       ├── CaffeinatePanel.swift       # Root popover view
 │       ├── FlagToggleRow.swift         # Toggle row with label + description
+│       ├── MenuBarIcon.swift          # Icon + circular progress ring overlay
 │       ├── TimeoutPicker.swift         # Duration picker with h:m:s fields
 │       └── TimerDisplay.swift          # Countdown display + formatDuration()
 └── CaffeinateUIMain/
