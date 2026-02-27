@@ -4,6 +4,12 @@ A native macOS menu bar app that provides a GUI for the [`caffeinate`](https://s
 
 ![Screenshot](screenshot.png)
 
+## Why?
+
+macOS ships with `caffeinate` — a handy command that prevents your Mac from sleeping — but it's buried in the terminal. There's no built-in way to toggle it from the menu bar, see which flags are active, or know how much time is left on a timeout. You either leave a terminal window open or forget it's running entirely.
+
+Caffeinate UI puts all of that in a single menu bar popover: pick your flags, set a timeout, and watch the cup drain as it counts down. No terminal needed.
+
 ## Features
 
 - **Toggle flags** — Enable/disable caffeinate flags individually:
