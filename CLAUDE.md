@@ -19,5 +19,8 @@ macOS menu bar app providing a GUI for the `caffeinate` command.
 
 ## Conventions
 - `@Observable` (not `ObservableObject`) for state
-- Kill-and-respawn pattern: changing flags kills existing process and spawns new one
+- Kill-and-respawn pattern: changing flags/timeout kills existing process and spawns new one
 - `LSUIElement = true` — no Dock icon
+- Single-instance guard via POSIX file lock (`/tmp/caffeinate-ui.lock`)
+- Kills stale caffeinate processes on launch
+- Termination handler uses identity check (`===`) to avoid race conditions on rapid toggle changes
