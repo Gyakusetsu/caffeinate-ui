@@ -228,6 +228,13 @@ final class CaffeinateViewModel {
 
             if remaining <= 0 {
                 self.stopCountdown()
+                self.isActive = false
+                self.remainingSeconds = 0
+                self.totalTimeoutSeconds = 0
+                self.timeoutStartDate = nil
+                self.timeoutProgress = 0
+                self.enabledFlags = [:]
+                self.saveState()
             }
         }
     }
