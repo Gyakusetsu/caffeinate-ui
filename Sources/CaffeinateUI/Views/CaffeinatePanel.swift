@@ -55,8 +55,15 @@ struct CaffeinatePanel: View {
                     NSApp.terminate(nil)
                 }
             }
+
+            Divider()
+
+            Text("Made by Reymar & Claude")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .center)
         }
         .padding()
-        .frame(width: 280)
+        .frame(width: 340)
     }
 }
