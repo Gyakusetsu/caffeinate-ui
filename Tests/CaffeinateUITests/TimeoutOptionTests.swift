@@ -7,6 +7,8 @@ final class TimeoutOptionTests: XCTestCase {
         XCTAssertEqual(TimeoutOption.minutes30.seconds(customSeconds: 0), 1800)
         XCTAssertEqual(TimeoutOption.hours1.seconds(customSeconds: 0), 3600)
         XCTAssertEqual(TimeoutOption.hours2.seconds(customSeconds: 0), 7200)
+        XCTAssertEqual(TimeoutOption.hours8.seconds(customSeconds: 0), 28800)
+        XCTAssertEqual(TimeoutOption.hours12.seconds(customSeconds: 0), 43200)
         XCTAssertNil(TimeoutOption.indefinite.seconds(customSeconds: 0))
     }
 
@@ -23,11 +25,11 @@ final class TimeoutOptionTests: XCTestCase {
     }
 
     func testAllCasesOrder() {
-        let expected: [TimeoutOption] = [.minutes15, .minutes30, .hours1, .hours2, .custom, .indefinite]
+        let expected: [TimeoutOption] = [.minutes15, .minutes30, .hours1, .hours2, .hours8, .hours12, .custom, .indefinite]
         XCTAssertEqual(TimeoutOption.allCases, expected)
     }
 
     func testAllCasesCount() {
-        XCTAssertEqual(TimeoutOption.allCases.count, 6)
+        XCTAssertEqual(TimeoutOption.allCases.count, 8)
     }
 }

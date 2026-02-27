@@ -14,7 +14,7 @@ A native macOS menu bar app that provides a GUI for the [`caffeinate`](https://s
 - **Enable All** — Master toggle to enable/disable all flags at once
 - **Persistent state** — Toggles and timeout settings are remembered across app launches
 - **Launch at Login** — Option to start the app automatically at login via SMAppService
-- **Timeout picker** — Preset durations (15m, 30m, 1h, 2h), custom h:m:s input, or indefinite
+- **Timeout picker** — Preset durations (15m, 30m, 1h, 2h, 8h, 12h), custom h:m:s input, or indefinite
 - **Live countdown** — Shows remaining time next to the timeout picker
 - **Command display** — Shows the exact `caffeinate` command being run
 - **Progress ring** — Circular arc around the menu bar icon depletes as a timed timeout counts down
