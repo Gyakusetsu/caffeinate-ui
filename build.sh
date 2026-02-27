@@ -11,10 +11,11 @@ swift build -c release
 
 echo "Creating app bundle..."
 rm -rf "${BUNDLE_DIR}"
-mkdir -p "${MACOS_DIR}"
+mkdir -p "${MACOS_DIR}" "${CONTENTS_DIR}/Resources"
 
 cp .build/release/CaffeinateUI "${MACOS_DIR}/CaffeinateUI"
 cp Resources/Info.plist "${CONTENTS_DIR}/Info.plist"
+cp Resources/AppIcon.icns "${CONTENTS_DIR}/Resources/AppIcon.icns"
 
 INSTALL_DIR="/Applications/${APP_NAME}.app"
 echo "Installing to ${INSTALL_DIR}..."
