@@ -19,7 +19,7 @@ struct MenuBarIcon: View {
                 self.drawSymbol(outlineName, in: rect)
 
                 NSGraphicsContext.saveGraphicsState()
-                let clipHeight = (rect.height - 6) * CGFloat(self.progress)
+                let clipHeight = (rect.height - 10) * CGFloat(self.progress)
                 NSBezierPath(rect: NSRect(x: 0, y: 0, width: rect.width, height: clipHeight)).setClip()
                 self.drawSymbol(self.iconName, in: rect)
                 NSGraphicsContext.restoreGraphicsState()
