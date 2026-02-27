@@ -37,14 +37,21 @@ jobs:
           cp Resources/Info.plist "${CONTENTS_DIR}/Info.plist"
           cp Resources/AppIcon.icns "${CONTENTS_DIR}/Resources/AppIcon.icns"
 
+      - name: Install create-dmg
+        run: brew install create-dmg
+
       - name: Create DMG
         run: |
-          DMG_NAME="Caffeinate-UI-${GITHUB_REF_NAME}.dmg"
-          STAGING_DIR=$(mktemp -d)
-          cp -R ".build/release/Caffeinate UI.app" "${STAGING_DIR}/"
-          ln -s /Applications "${STAGING_DIR}/Applications"
-          hdiutil create -volname "Caffeinate UI" -srcfolder "${STAGING_DIR}" \
-            -ov -format UDZO "${DMG_NAME}"
+          create-dmg \
+            --volname "Caffeinate UI" \
+            --window-pos 200 120 \
+            --window-size 600 400 \
+            --icon-size 128 \
+            --icon "Caffeinate UI.app" 150 185 \
+            --app-drop-link 450 185 \
+            --no-internet-enable \
+            "Caffeinate-UI-${GITHUB_REF_NAME}.dmg" \
+            ".build/release/Caffeinate UI.app"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
