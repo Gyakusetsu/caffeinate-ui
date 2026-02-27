@@ -61,7 +61,7 @@ final class CaffeinateViewModelTests: XCTestCase {
     // MARK: - iconName
 
     func testIconNameInactive() {
-        XCTAssertEqual(vm.iconName, "cup.and.saucer")
+        XCTAssertEqual(vm.iconName, "cup.and.heat.waves")
     }
 
     // MARK: - stopAll

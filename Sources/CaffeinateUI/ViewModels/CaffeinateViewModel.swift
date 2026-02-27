@@ -55,7 +55,7 @@ final class CaffeinateViewModel {
     }
 
     var iconName: String {
-        isActive ? "cup.and.saucer.fill" : "cup.and.saucer"
+        isActive ? "cup.and.heat.waves.fill" : "cup.and.heat.waves"
     }
 
     var activeFlags: [CaffeinateFlag] {

@@ -13,44 +13,33 @@ struct MenuBarIcon: View {
         let imageSize = NSSize(width: size, height: size)
 
         let image = NSImage(size: imageSize, flipped: false) { rect in
-            let iconSize: CGFloat = self.progress > 0 ? 9 : 12
-            self.drawSymbol(in: rect, pointSize: iconSize)
-
             if self.progress > 0 {
-                self.drawProgressRing(in: rect)
-            }
+                // Draw outline cup as base, then overlay filled cup clipped to progress
+                let outlineName = self.iconName.replacingOccurrences(of: ".fill", with: "")
+                self.drawSymbol(outlineName, in: rect)
 
+                NSGraphicsContext.saveGraphicsState()
+                let clipHeight = rect.height * CGFloat(self.progress)
+                NSBezierPath(rect: NSRect(x: 0, y: 0, width: rect.width, height: clipHeight)).setClip()
+                self.drawSymbol(self.iconName, in: rect)
+                NSGraphicsContext.restoreGraphicsState()
+            } else {
+                self.drawSymbol(self.iconName, in: rect)
+            }
             return true
         }
         image.isTemplate = true
         return image
     }
 
-    private func drawSymbol(in rect: NSRect, pointSize: CGFloat) {
-        guard let symbol = NSImage(systemSymbolName: iconName, accessibilityDescription: nil)?
-            .withSymbolConfiguration(.init(pointSize: pointSize, weight: .regular)) else { return }
+    private func drawSymbol(_ name: String, in rect: NSRect) {
+        guard let symbol = NSImage(systemSymbolName: name, accessibilityDescription: nil)?
+            .withSymbolConfiguration(.init(pointSize: 12, weight: .regular)) else { return }
         let symbolSize = symbol.size
         let origin = NSPoint(
             x: (rect.width - symbolSize.width) / 2,
             y: (rect.height - symbolSize.height) / 2
         )
         symbol.draw(at: origin, from: .zero, operation: .sourceOver, fraction: 1)
-    }
-
-    private func drawProgressRing(in rect: NSRect) {
-        let inset: CGFloat = 0.75
-        let ringRect = rect.insetBy(dx: inset, dy: inset)
-        let path = NSBezierPath()
-        path.appendArc(
-            withCenter: NSPoint(x: ringRect.midX, y: ringRect.midY),
-            radius: min(ringRect.width, ringRect.height) / 2,
-            startAngle: 90,
-            endAngle: 90 - 360 * CGFloat(progress),
-            clockwise: true
-        )
-        path.lineWidth = 1.5
-        path.lineCapStyle = .round
-        NSColor.black.setStroke()
-        path.stroke()
     }
 }
