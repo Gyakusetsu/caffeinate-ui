@@ -16,17 +16,21 @@ A native macOS menu bar app that provides a GUI for the [`caffeinate`](https://s
 - **Launch at Login** — Option to start the app automatically at login via SMAppService
 - **Timeout picker** — Preset durations (15m, 30m, 1h, 2h, 8h, 12h), custom h:m:s input, or indefinite
 - **Live countdown** — Shows remaining time next to the timeout picker
-- **Command display** — Shows the exact `caffeinate` command being run
-- **Progress ring** — Circular arc around the menu bar icon depletes as a timed timeout counts down
-- **Reactive icon** — Menu bar icon changes from outline to filled when active
+- **Command display** — Shows the exact `caffeinate` command being run (including the hidden 8-hour cap for `-u` + indefinite)
+- **Draining cup icon** — Menu bar icon fills when active and drains from bottom-up as the timeout counts down
+- **Reactive icon** — Menu bar icon changes from outline (`cup.and.heat.waves`) to filled when active
 - **Single instance** — Only one instance can run at a time (POSIX file lock)
 - **Clean startup** — Kills any stale caffeinate processes from previous sessions
 - **Graceful cleanup** — Terminates caffeinate when the app quits
 
+## Install
+
+Download the latest DMG from the [Releases](https://github.com/Gyakusetsu/caffeinate-ui/releases) page, open it, and drag **Caffeinate UI** to Applications.
+
 ## Requirements
 
 - macOS 14+ (Sonoma)
-- Swift 5.10+
+- Swift 5.10+ (for building from source)
 
 ## Build & Run
 
@@ -42,7 +46,7 @@ swift build && swift run CaffeinateUI
 swift test
 ```
 
-**Release + install:**
+**Release + install locally:**
 
 ```sh
 ./build.sh
