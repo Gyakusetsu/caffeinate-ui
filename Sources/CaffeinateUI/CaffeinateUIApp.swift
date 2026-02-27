@@ -11,7 +11,12 @@ public struct CaffeinateUIApp: App {
         MenuBarExtra {
             CaffeinatePanel(viewModel: viewModel)
         } label: {
-            MenuBarIcon(iconName: viewModel.iconName, progress: viewModel.timeoutProgress)
+            TimelineView(.periodic(from: .now, by: 1)) { context in
+                MenuBarIcon(
+                    iconName: viewModel.iconName,
+                    progress: viewModel.timeoutProgress(at: context.date)
+                )
+            }
         }
         .menuBarExtraStyle(.window)
     }

@@ -9,7 +9,7 @@ struct MenuBarIcon: View {
     }
 
     private func createMenuBarImage() -> NSImage {
-        let size: CGFloat = 18
+        let size: CGFloat = 22
         let imageSize = NSSize(width: size, height: size)
 
         let image = NSImage(size: imageSize, flipped: false) { rect in
@@ -34,7 +34,7 @@ struct MenuBarIcon: View {
 
     private func drawSymbol(_ name: String, in rect: NSRect) {
         guard let symbol = NSImage(systemSymbolName: name, accessibilityDescription: nil)?
-            .withSymbolConfiguration(.init(pointSize: 12, weight: .regular)) else { return }
+            .withSymbolConfiguration(.init(pointSize: 15, weight: .regular)) else { return }
         let symbolSize = symbol.size
         let origin = NSPoint(
             x: (rect.width - symbolSize.width) / 2,

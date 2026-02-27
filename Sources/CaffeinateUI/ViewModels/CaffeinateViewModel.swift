@@ -20,11 +20,13 @@ final class CaffeinateViewModel {
     }
     var remainingSeconds: Int = 0
     private(set) var totalTimeoutSeconds: Int = 0
+    private(set) var timeoutStartDate: Date?
     private(set) var isActive: Bool = false
 
-    var timeoutProgress: Double {
-        guard totalTimeoutSeconds > 0 else { return 0 }
-        return Double(remainingSeconds) / Double(totalTimeoutSeconds)
+    func timeoutProgress(at date: Date = Date()) -> Double {
+        guard totalTimeoutSeconds > 0, let start = timeoutStartDate else { return 0 }
+        let elapsed = date.timeIntervalSince(start)
+        return max(0, min(1, 1 - elapsed / Double(totalTimeoutSeconds)))
     }
 
     var launchAtLogin: Bool = SMAppService.mainApp.status == .enabled {
@@ -85,6 +87,7 @@ final class CaffeinateViewModel {
             self?.stopCountdown()
             self?.remainingSeconds = 0
             self?.totalTimeoutSeconds = 0
+            self?.timeoutStartDate = nil
             self?.enabledFlags = [:]
             self?.saveState()
         }
@@ -128,6 +131,7 @@ final class CaffeinateViewModel {
         enabledFlags = [:]
         remainingSeconds = 0
         totalTimeoutSeconds = 0
+        timeoutStartDate = nil
         saveState()
     }
 
@@ -174,6 +178,7 @@ final class CaffeinateViewModel {
             stopCountdown()
             remainingSeconds = 0
             totalTimeoutSeconds = 0
+            timeoutStartDate = nil
             return
         }
 
@@ -186,10 +191,12 @@ final class CaffeinateViewModel {
         if let userTimeout {
             remainingSeconds = userTimeout
             totalTimeoutSeconds = userTimeout
+            timeoutStartDate = Date()
             startCountdown()
         } else {
             remainingSeconds = 0
             totalTimeoutSeconds = 0
+            timeoutStartDate = nil
             stopCountdown()
         }
     }
