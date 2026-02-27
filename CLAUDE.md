@@ -22,6 +22,7 @@ macOS menu bar app providing a GUI for the `caffeinate` command.
 - **Services**: `CaffeinateServiceProtocol` / `CaffeinateService` — spawns/kills `/usr/bin/caffeinate` Process; `UserDefaultsProtocol` for testable persistence
 - **ViewModels**: `CaffeinateViewModel` — `@Observable` state management, accepts `service` and `defaults` via init; persists flags/timeout to UserDefaults; `launchAtLogin` via `SMAppService`
 - **Views**: SwiftUI views using `MenuBarExtra` with `.window` style; includes "Enable All" master toggle, "Launch at Login" option, and `MenuBarIcon` with circular progress ring overlay
+- **Resources**: `Info.plist`, `AppIcon.icns` (coffee cup icon generated from SF Symbol)
 
 ## Testing
 - XCTest with `@testable import CaffeinateCore`
@@ -41,4 +42,5 @@ macOS menu bar app providing a GUI for the `caffeinate` command.
 - `restoreState()` sets properties directly (not via bindings) so caffeinate does NOT auto-start on launch
 - `onTermination` callback clears `enabledFlags` and calls `saveState()` so UI resets when timeout expires naturally
 - `totalTimeoutSeconds` tracks the initial timeout for progress ring calculation; `timeoutProgress` = remaining/total
+- `MenuBarIcon` renders via `NSImage` (not SwiftUI shapes) because `MenuBarExtra` converts labels to template images; uses `isTemplate = true` so the ring matches the icon color and adapts to light/dark
 - After completing a task, update README.md and CLAUDE.md if the changes affect architecture, build commands, or conventions
