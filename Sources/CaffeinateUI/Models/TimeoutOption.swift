@@ -24,13 +24,13 @@ enum TimeoutOption: Hashable, CaseIterable, Identifiable {
     }
 
     /// Returns the duration in seconds, or nil for indefinite.
-    func seconds(customMinutes: Int) -> Int? {
+    func seconds(customSeconds: Int) -> Int? {
         switch self {
         case .minutes15: 15 * 60
         case .minutes30: 30 * 60
         case .hours1: 60 * 60
         case .hours2: 2 * 60 * 60
-        case .custom: customMinutes * 60
+        case .custom: max(customSeconds, 1)
         case .indefinite: nil
         }
     }

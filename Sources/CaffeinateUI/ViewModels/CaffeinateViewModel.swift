@@ -4,7 +4,7 @@ import SwiftUI
 final class CaffeinateViewModel {
     var enabledFlags: [CaffeinateFlag: Bool] = [:]
     var selectedTimeout: TimeoutOption = .indefinite { didSet { if isActive { syncProcess() } } }
-    var customTimeoutMinutes: Int = 10 { didSet { if isActive { syncProcess() } } }
+    var customTimeoutSeconds: Int = 600 { didSet { if isActive { syncProcess() } } }
     var remainingSeconds: Int = 0
     private(set) var isActive: Bool = false
 
@@ -23,7 +23,7 @@ final class CaffeinateViewModel {
         let flags = activeFlags
         guard !flags.isEmpty else { return nil }
         var parts = ["caffeinate"] + flags.map(\.rawValue)
-        if let timeout = selectedTimeout.seconds(customMinutes: customTimeoutMinutes) {
+        if let timeout = selectedTimeout.seconds(customSeconds: customTimeoutSeconds) {
             parts += ["-t", "\(timeout)"]
         }
         return parts.joined(separator: " ")
@@ -82,7 +82,7 @@ final class CaffeinateViewModel {
         isActive = true
 
         // Only show countdown for user-chosen timeouts, not the internal -u override
-        let userTimeout = selectedTimeout.seconds(customMinutes: customTimeoutMinutes)
+        let userTimeout = selectedTimeout.seconds(customSeconds: customTimeoutSeconds)
         if let userTimeout {
             remainingSeconds = userTimeout
             startCountdown()
@@ -94,7 +94,7 @@ final class CaffeinateViewModel {
 
     private func resolveTimeout(flags: [CaffeinateFlag]) -> Int? {
         let hasUserActive = flags.contains(.declareUserActive)
-        let timeout = selectedTimeout.seconds(customMinutes: customTimeoutMinutes)
+        let timeout = selectedTimeout.seconds(customSeconds: customTimeoutSeconds)
 
         if hasUserActive && timeout == nil {
             return 8 * 60 * 60

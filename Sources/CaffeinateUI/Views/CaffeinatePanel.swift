@@ -27,19 +27,21 @@ struct CaffeinatePanel: View {
 
             Divider()
 
-            // Timeout picker
-            TimeoutPicker(
-                selectedTimeout: $viewModel.selectedTimeout,
-                customMinutes: $viewModel.customTimeoutMinutes
-            )
-
-            // Timer display
-            if viewModel.isActive, viewModel.remainingSeconds > 0 {
-                TimerDisplay(remainingSeconds: viewModel.remainingSeconds)
+            // Timeout picker + remaining time
+            HStack {
+                TimeoutPicker(
+                    selectedTimeout: $viewModel.selectedTimeout,
+                    customSeconds: $viewModel.customTimeoutSeconds
+                )
+                Spacer()
+                if viewModel.isActive, viewModel.remainingSeconds > 0 {
+                    TimerDisplay(remainingSeconds: viewModel.remainingSeconds)
+                }
             }
 
             // Command display
             if let command = viewModel.commandString {
+                Divider()
                 Text(command)
                     .font(.system(.caption, design: .monospaced))
                     .foregroundStyle(.secondary)
@@ -66,10 +68,14 @@ struct CaffeinatePanel: View {
 
             Divider()
 
-            Text("Made by Reymar & Claude")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity, alignment: .center)
+            HStack(spacing: 4) {
+                Text("Made by Reymar &")
+                Image(systemName: "sparkles")
+                Text("Claude")
+            }
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .center)
         }
         .padding()
         .frame(width: 340)
