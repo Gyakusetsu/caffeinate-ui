@@ -21,7 +21,7 @@ macOS menu bar app providing a GUI for the `caffeinate` command.
 - **Models**: `CaffeinateFlag`, `TimeoutOption` — `Codable` value types for flags and durations
 - **Services**: `CaffeinateServiceProtocol` / `CaffeinateService` — spawns/kills `/usr/bin/caffeinate` Process; `UserDefaultsProtocol` for testable persistence
 - **ViewModels**: `CaffeinateViewModel` — `@Observable` state management, accepts `service` and `defaults` via init; persists flags/timeout to UserDefaults; `launchAtLogin` via `SMAppService`
-- **Views**: SwiftUI views using `MenuBarExtra` with `.window` style; includes "Enable All" master toggle, "Launch at Login" option, and `MenuBarIcon` with circular progress ring overlay
+- **Views**: SwiftUI views using `MenuBarExtra` with `.window` style; includes "Enable All" master toggle, "Launch at Login" option, and `MenuBarIcon` with draining cup fill overlay
 - **Resources**: `Info.plist`, `AppIcon.icns` (coffee cup icon generated from SF Symbol)
 
 ## Testing
@@ -40,7 +40,8 @@ macOS menu bar app providing a GUI for the `caffeinate` command.
 - Termination handler uses identity check (`===`) to avoid race conditions on rapid toggle changes
 - State persistence: `isRestoring` flag suppresses `didSet` → `saveState()` during `restoreState()` to avoid cross-property overwrites
 - `restoreState()` sets properties directly (not via bindings) so caffeinate does NOT auto-start on launch
-- `onTermination` callback clears `enabledFlags` and calls `saveState()` so UI resets when timeout expires naturally
-- `totalTimeoutSeconds` tracks the initial timeout for progress ring calculation; `timeoutProgress` = remaining/total
-- `MenuBarIcon` renders via `NSImage` (not SwiftUI shapes) because `MenuBarExtra` converts labels to template images; uses `isTemplate = true` so the ring matches the icon color and adapts to light/dark
+- `onTermination` callback clears `enabledFlags` and calls `saveState()` so UI resets when timeout expires naturally; countdown timer also clears state when reaching zero to avoid refill flash
+- `totalTimeoutSeconds` tracks the initial timeout; `timeoutProgress` stored var updated every 0.25s from `timeoutStartDate` for smooth drain animation
+- `MenuBarIcon` renders via `NSImage` (not SwiftUI shapes) because `MenuBarExtra` converts labels to template images; uses `isTemplate = true` so the icon adapts to light/dark; `TimelineView` does NOT work in `MenuBarExtra` labels
+- `MenuBarIcon` uses `cup.and.heat.waves` / `cup.and.heat.waves.fill` SF Symbols; drain effect clips filled icon from bottom up with top/bottom offsets to avoid clipping steam waves and saucer
 - After completing a task, update README.md and CLAUDE.md if the changes affect architecture, build commands, or conventions
