@@ -11,7 +11,7 @@ public struct CaffeinateUIApp: App {
         MenuBarExtra {
             CaffeinatePanel(viewModel: viewModel)
         } label: {
-            MenuBarIcon(iconName: viewModel.iconName, progress: viewModel.timeoutProgress())
+            MenuBarIcon(iconName: viewModel.iconName, progress: viewModel.timeoutProgress)
         }
         .menuBarExtraStyle(.window)
     }

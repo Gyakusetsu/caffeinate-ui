@@ -21,13 +21,8 @@ final class CaffeinateViewModel {
     var remainingSeconds: Int = 0
     private(set) var totalTimeoutSeconds: Int = 0
     private(set) var timeoutStartDate: Date?
+    private(set) var timeoutProgress: Double = 0
     private(set) var isActive: Bool = false
-
-    func timeoutProgress(at date: Date = Date()) -> Double {
-        guard totalTimeoutSeconds > 0, let start = timeoutStartDate else { return 0 }
-        let elapsed = date.timeIntervalSince(start)
-        return max(0, min(1, 1 - elapsed / Double(totalTimeoutSeconds)))
-    }
 
     var launchAtLogin: Bool = SMAppService.mainApp.status == .enabled {
         didSet {
@@ -88,6 +83,7 @@ final class CaffeinateViewModel {
             self?.remainingSeconds = 0
             self?.totalTimeoutSeconds = 0
             self?.timeoutStartDate = nil
+            self?.timeoutProgress = 0
             self?.enabledFlags = [:]
             self?.saveState()
         }
@@ -132,6 +128,7 @@ final class CaffeinateViewModel {
         remainingSeconds = 0
         totalTimeoutSeconds = 0
         timeoutStartDate = nil
+        timeoutProgress = 0
         saveState()
     }
 
@@ -179,6 +176,7 @@ final class CaffeinateViewModel {
             remainingSeconds = 0
             totalTimeoutSeconds = 0
             timeoutStartDate = nil
+            timeoutProgress = 0
             return
         }
 
@@ -192,11 +190,13 @@ final class CaffeinateViewModel {
             remainingSeconds = userTimeout
             totalTimeoutSeconds = userTimeout
             timeoutStartDate = Date()
+            timeoutProgress = 1
             startCountdown()
         } else {
             remainingSeconds = 0
             totalTimeoutSeconds = 0
             timeoutStartDate = nil
+            timeoutProgress = 0
             stopCountdown()
         }
     }
@@ -213,11 +213,20 @@ final class CaffeinateViewModel {
 
     private func startCountdown() {
         stopCountdown()
-        countdownTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
-            guard let self else { return }
-            if self.remainingSeconds > 0 {
-                self.remainingSeconds -= 1
-            } else {
+        countdownTimer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: true) { [weak self] _ in
+            guard let self, let start = self.timeoutStartDate else { return }
+            let total = Double(self.totalTimeoutSeconds)
+            let elapsed = Date().timeIntervalSince(start)
+            let remaining = total - elapsed
+
+            self.timeoutProgress = max(0, min(1, remaining / total))
+
+            let newSeconds = max(0, Int(remaining.rounded(.up)))
+            if self.remainingSeconds != newSeconds {
+                self.remainingSeconds = newSeconds
+            }
+
+            if remaining <= 0 {
                 self.stopCountdown()
             }
         }

@@ -178,7 +178,7 @@ final class CaffeinateViewModelTests: XCTestCase {
         binding.wrappedValue = true
 
         XCTAssertEqual(vm.totalTimeoutSeconds, 900)
-        XCTAssertEqual(vm.timeoutProgress(), 1.0, accuracy: 0.01)
+        XCTAssertEqual(vm.timeoutProgress, 1.0, accuracy: 0.01)
     }
 
     func testTimeoutProgressZeroWhenIndefinite() {
@@ -186,11 +186,11 @@ final class CaffeinateViewModelTests: XCTestCase {
         let binding = vm.binding(for: .preventDisplaySleep)
         binding.wrappedValue = true
 
-        XCTAssertEqual(vm.timeoutProgress(), 0)
+        XCTAssertEqual(vm.timeoutProgress, 0)
     }
 
     func testTimeoutProgressZeroWhenInactive() {
-        XCTAssertEqual(vm.timeoutProgress(), 0)
+        XCTAssertEqual(vm.timeoutProgress, 0)
     }
 
     // MARK: - Master toggle
