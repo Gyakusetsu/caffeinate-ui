@@ -13,17 +13,16 @@ struct CaffeinatePanel: View {
                 Text("Caffeinate")
                     .font(.headline)
                 Spacer()
+                Toggle("Enable All", isOn: Binding(
+                    get: { CaffeinateFlag.allCases.allSatisfy { self.viewModel.enabledFlags[$0] == true } },
+                    set: { viewModel.toggleAllFlags($0) }
+                ))
+                .toggleStyle(.checkbox)
             }
 
             Divider()
 
-            // Master toggle + flag toggles
-            Toggle("Enable All", isOn: Binding(
-                get: { CaffeinateFlag.allCases.allSatisfy { self.viewModel.enabledFlags[$0] == true } },
-                set: { viewModel.toggleAllFlags($0) }
-            ))
-            .toggleStyle(.checkbox)
-
+            // Flag toggles
             ForEach(CaffeinateFlag.allCases) { flag in
                 FlagToggleRow(
                     flag: flag,
@@ -58,6 +57,12 @@ struct CaffeinatePanel: View {
 
             // Actions
             HStack {
+                Toggle("Launch at Login", isOn: Binding(
+                    get: { viewModel.launchAtLogin },
+                    set: { viewModel.launchAtLogin = $0 }
+                ))
+                .toggleStyle(.checkbox)
+                Spacer()
                 if viewModel.isActive {
                     Button("Stop All") {
                         viewModel.stopAll()
@@ -65,18 +70,11 @@ struct CaffeinatePanel: View {
                     .buttonStyle(.borderedProminent)
                     .tint(.red)
                 }
-                Spacer()
                 Button("Quit") {
                     viewModel.stopAll()
                     NSApp.terminate(nil)
                 }
             }
-
-            Toggle("Launch at Login", isOn: Binding(
-                get: { viewModel.launchAtLogin },
-                set: { viewModel.launchAtLogin = $0 }
-            ))
-            .toggleStyle(.checkbox)
 
             Divider()
 
