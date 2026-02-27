@@ -21,10 +21,13 @@ final class CaffeinateService {
         }
         process.arguments = arguments
 
-        process.terminationHandler = { [weak self] _ in
+        process.terminationHandler = { [weak self] terminated in
             DispatchQueue.main.async {
-                self?.process = nil
-                self?.onTermination?()
+                // Only handle if this is still the current process,
+                // not a stale one from a previous kill-and-respawn
+                guard let self, self.process === terminated else { return }
+                self.process = nil
+                self.onTermination?()
             }
         }
 

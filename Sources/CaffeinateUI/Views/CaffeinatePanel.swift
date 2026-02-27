@@ -38,6 +38,14 @@ struct CaffeinatePanel: View {
                 TimerDisplay(remainingSeconds: viewModel.remainingSeconds)
             }
 
+            // Command display
+            if let command = viewModel.commandString {
+                Text(command)
+                    .font(.system(.caption, design: .monospaced))
+                    .foregroundStyle(.secondary)
+                    .textSelection(.enabled)
+            }
+
             Divider()
 
             // Actions

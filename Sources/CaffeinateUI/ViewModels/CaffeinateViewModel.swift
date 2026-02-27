@@ -3,26 +3,39 @@ import SwiftUI
 @Observable
 final class CaffeinateViewModel {
     var enabledFlags: [CaffeinateFlag: Bool] = [:]
-    var selectedTimeout: TimeoutOption = .indefinite
-    var customTimeoutMinutes: Int = 10
+    var selectedTimeout: TimeoutOption = .indefinite { didSet { if isActive { syncProcess() } } }
+    var customTimeoutMinutes: Int = 10 { didSet { if isActive { syncProcess() } } }
     var remainingSeconds: Int = 0
+    private(set) var isActive: Bool = false
 
     private let service = CaffeinateService()
     private var countdownTimer: Timer?
 
-    var isActive: Bool { service.isRunning }
-
     var iconName: String {
-        service.isRunning ? "cup.and.saucer.fill" : "cup.and.saucer"
+        isActive ? "cup.and.saucer.fill" : "cup.and.saucer"
     }
 
     var activeFlags: [CaffeinateFlag] {
         CaffeinateFlag.allCases.filter { enabledFlags[$0] == true }
     }
 
+    var commandString: String? {
+        let flags = activeFlags
+        guard !flags.isEmpty else { return nil }
+        var parts = ["caffeinate"] + flags.map(\.rawValue)
+        if let timeout = selectedTimeout.seconds(customMinutes: customTimeoutMinutes) {
+            parts += ["-t", "\(timeout)"]
+        }
+        return parts.joined(separator: " ")
+    }
+
     init() {
+        killStaleProcesses()
+
         service.onTermination = { [weak self] in
-            self?.handleProcessTerminated()
+            self?.isActive = false
+            self?.stopCountdown()
+            self?.remainingSeconds = 0
         }
 
         NotificationCenter.default.addObserver(
@@ -46,6 +59,7 @@ final class CaffeinateViewModel {
 
     func stopAll() {
         service.stop()
+        isActive = false
         stopCountdown()
         enabledFlags = [:]
         remainingSeconds = 0
@@ -57,6 +71,7 @@ final class CaffeinateViewModel {
         let flags = activeFlags
         guard !flags.isEmpty else {
             service.stop()
+            isActive = false
             stopCountdown()
             remainingSeconds = 0
             return
@@ -64,9 +79,12 @@ final class CaffeinateViewModel {
 
         let timeout = resolveTimeout(flags: flags)
         service.start(flags: flags, timeout: timeout)
+        isActive = true
 
-        if let timeout {
-            remainingSeconds = timeout
+        // Only show countdown for user-chosen timeouts, not the internal -u override
+        let userTimeout = selectedTimeout.seconds(customMinutes: customTimeoutMinutes)
+        if let userTimeout {
+            remainingSeconds = userTimeout
             startCountdown()
         } else {
             remainingSeconds = 0
@@ -75,14 +93,11 @@ final class CaffeinateViewModel {
     }
 
     private func resolveTimeout(flags: [CaffeinateFlag]) -> Int? {
-        // -u flag has a default 5s timeout if no explicit timeout is set,
-        // so always provide an explicit timeout when -u is active
         let hasUserActive = flags.contains(.declareUserActive)
         let timeout = selectedTimeout.seconds(customMinutes: customTimeoutMinutes)
 
         if hasUserActive && timeout == nil {
-            // -u without timeout defaults to 5s — override with a long duration
-            return 8 * 60 * 60 // 8 hours
+            return 8 * 60 * 60
         }
         return timeout
     }
@@ -104,8 +119,12 @@ final class CaffeinateViewModel {
         countdownTimer = nil
     }
 
-    private func handleProcessTerminated() {
-        stopCountdown()
-        remainingSeconds = 0
+    /// Kill any caffeinate processes left over from previous sessions
+    private func killStaleProcesses() {
+        let task = Process()
+        task.executableURL = URL(fileURLWithPath: "/usr/bin/pkill")
+        task.arguments = ["-x", "caffeinate"]
+        try? task.run()
+        task.waitUntilExit()
     }
 }
