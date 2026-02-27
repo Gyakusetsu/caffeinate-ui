@@ -57,10 +57,7 @@ struct CaffeinatePanel: View {
 
             // Actions
             HStack {
-                Toggle("Launch at Login", isOn: Binding(
-                    get: { viewModel.launchAtLogin },
-                    set: { viewModel.launchAtLogin = $0 }
-                ))
+                Toggle("Launch at Login", isOn: $viewModel.launchAtLogin)
                 .toggleStyle(.checkbox)
                 Spacer()
                 if viewModel.isActive {
@@ -71,7 +68,6 @@ struct CaffeinatePanel: View {
                     .tint(.red)
                 }
                 Button("Quit") {
-                    viewModel.stopAll()
                     NSApp.terminate(nil)
                 }
             }

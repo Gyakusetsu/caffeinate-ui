@@ -21,17 +21,18 @@ final class CaffeinateViewModel {
     var remainingSeconds: Int = 0
     private(set) var isActive: Bool = false
 
-    var launchAtLogin: Bool {
-        get { SMAppService.mainApp.status == .enabled }
-        set {
+    var launchAtLogin: Bool = SMAppService.mainApp.status == .enabled {
+        didSet {
             do {
-                if newValue {
+                if launchAtLogin {
                     try SMAppService.mainApp.register()
                 } else {
                     try SMAppService.mainApp.unregister()
                 }
             } catch {
-                // Registration can fail if user denies in System Settings
+                // Registration can fail if user denies in System Settings;
+                // revert to actual state so the toggle stays in sync.
+                launchAtLogin = SMAppService.mainApp.status == .enabled
             }
         }
     }
