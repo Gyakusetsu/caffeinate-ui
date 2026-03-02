@@ -200,13 +200,7 @@ final class CaffeinateViewModel {
     }
 
     private func resolveTimeout(flags: [CaffeinateFlag]) -> Int? {
-        let hasUserActive = flags.contains(.declareUserActive)
-        let timeout = selectedTimeout.seconds(customSeconds: customTimeoutSeconds)
-
-        if hasUserActive && timeout == nil {
-            return 8 * 60 * 60
-        }
-        return timeout
+        selectedTimeout.seconds(customSeconds: customTimeoutSeconds)
     }
 
     private func startCountdown() {

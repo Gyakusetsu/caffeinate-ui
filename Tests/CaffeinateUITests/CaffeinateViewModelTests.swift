@@ -51,10 +51,10 @@ final class CaffeinateViewModelTests: XCTestCase {
         XCTAssertEqual(vm.commandString, "caffeinate -d")
     }
 
-    func testCommandStringDeclareUserActiveIndefiniteShows8HourTimeout() {
+    func testCommandStringDeclareUserActiveIndefiniteHasNoTimeout() {
         vm.enabledFlags = [.declareUserActive: true]
         vm.selectedTimeout = .indefinite
-        XCTAssertEqual(vm.commandString, "caffeinate -u -t 28800")
+        XCTAssertEqual(vm.commandString, "caffeinate -u")
     }
 
     func testCommandStringCustomTimeout() {
@@ -85,13 +85,13 @@ final class CaffeinateViewModelTests: XCTestCase {
         XCTAssertTrue(mock.stopCallCount > 0)
     }
 
-    // MARK: - -u + indefinite override
+    // MARK: - -u + indefinite
 
-    func testDeclareUserActiveIndefiniteApplies8HourOverride() {
+    func testDeclareUserActiveIndefinitePassesNilTimeout() {
         let binding = vm.binding(for: .declareUserActive)
         binding.wrappedValue = true
 
-        XCTAssertEqual(mock.lastStartTimeout, 8 * 60 * 60)
+        XCTAssertNil(mock.lastStartTimeout)
         XCTAssertEqual(mock.lastStartFlags, [.declareUserActive])
     }
 
@@ -195,13 +195,13 @@ final class CaffeinateViewModelTests: XCTestCase {
         XCTAssertEqual(vm.timeoutProgress, 0)
     }
 
-    func testTimeoutProgressNonZeroWhenDeclareUserActiveIndefinite() {
+    func testTimeoutProgressZeroWhenDeclareUserActiveIndefinite() {
         vm.selectedTimeout = .indefinite
         let binding = vm.binding(for: .declareUserActive)
         binding.wrappedValue = true
 
-        XCTAssertEqual(vm.totalTimeoutSeconds, 8 * 60 * 60)
-        XCTAssertEqual(vm.timeoutProgress, 1.0, accuracy: 0.01)
+        XCTAssertEqual(vm.totalTimeoutSeconds, 0)
+        XCTAssertEqual(vm.timeoutProgress, 0)
     }
 
     func testTimeoutProgressZeroWhenInactive() {
