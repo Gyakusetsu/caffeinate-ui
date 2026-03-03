@@ -78,7 +78,9 @@ final class CaffeinateViewModel {
         let flags = activeFlags
         guard !flags.isEmpty else { return nil }
         var parts = ["caffeinate"] + flags.map(\.rawValue)
-        if let timeout = selectedTimeout.seconds(customSeconds: customTimeoutSeconds, scheduledDate: scheduledDate) {
+        if isActive, totalTimeoutSeconds > 0 {
+            parts += ["-t", "\(totalTimeoutSeconds)"]
+        } else if !isActive, let timeout = selectedTimeout.seconds(customSeconds: customTimeoutSeconds, scheduledDate: scheduledDate) {
             parts += ["-t", "\(timeout)"]
         }
         return parts.joined(separator: " ")
