@@ -46,4 +46,5 @@ macOS menu bar app providing a GUI for the `caffeinate` command.
 - `MenuBarIcon` renders via `NSImage` (not SwiftUI shapes) because `MenuBarExtra` converts labels to template images; uses `isTemplate = true` so the icon adapts to light/dark; `TimelineView` does NOT work in `MenuBarExtra` labels
 - `MenuBarIcon` uses `cup.and.heat.waves` / `cup.and.heat.waves.fill` SF Symbols; drain effect clips filled icon from bottom up with top/bottom offsets to avoid clipping steam waves and saucer
 - Update checker fires async `Task` in `init` after `restoreState()`/`syncProcess()`; returns `.unknown` on any failure (graceful degradation); footer shows green dot (up to date), orange dot (update available, clickable), or no dot (unknown)
+- When a bug fix is applied, create a patch version tag (e.g. `v1.3` → `v1.3.1`), bump `CFBundleVersion` + `CFBundleShortVersionString` in `Resources/Info.plist` to match, and push both
 - After completing a task, update README.md and CLAUDE.md if the changes affect architecture, build commands, or conventions
