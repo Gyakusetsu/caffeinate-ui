@@ -90,6 +90,31 @@ final class PersistenceTests: XCTestCase {
         XCTAssertEqual(flags, [])
     }
 
+    // MARK: - Scheduled date persistence
+
+    func testSavesScheduledDateOnChange() {
+        let defaults = MockUserDefaults()
+        let mock = MockCaffeinateService()
+        let vm = CaffeinateViewModel(service: mock, defaults: defaults)
+
+        let futureDate = Date().addingTimeInterval(7200)
+        vm.scheduledDate = futureDate
+
+        let saved = defaults.double(forKey: "scheduledDate")
+        XCTAssertEqual(saved, futureDate.timeIntervalSince1970, accuracy: 0.001)
+    }
+
+    func testRestoresScheduledDateOnInit() {
+        let defaults = MockUserDefaults()
+        let futureDate = Date().addingTimeInterval(7200)
+        defaults.set(futureDate.timeIntervalSince1970, forKey: "scheduledDate")
+
+        let mock = MockCaffeinateService()
+        let vm = CaffeinateViewModel(service: mock, defaults: defaults)
+
+        XCTAssertEqual(vm.scheduledDate.timeIntervalSince1970, futureDate.timeIntervalSince1970, accuracy: 0.001)
+    }
+
     // MARK: - Corrupted defaults
 
     func testHandlesCorruptedFlagDataGracefully() {

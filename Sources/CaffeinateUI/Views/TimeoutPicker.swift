@@ -3,6 +3,7 @@ import SwiftUI
 struct TimeoutPicker: View {
     @Binding var selectedTimeout: TimeoutOption
     @Binding var customSeconds: Int
+    @Binding var scheduledDate: Date
 
     @State private var hours: Int = 0
     @State private var minutes: Int = 10
@@ -16,6 +17,14 @@ struct TimeoutPicker: View {
                 }
             }
             .pickerStyle(.menu)
+
+            if selectedTimeout == .scheduled {
+                DatePicker("Until", selection: $scheduledDate,
+                    in: Date().addingTimeInterval(60)...,
+                    displayedComponents: [.date, .hourAndMinute])
+                    .datePickerStyle(.compact)
+                    .labelsHidden()
+            }
 
             if selectedTimeout == .custom {
                 HStack(spacing: 4) {

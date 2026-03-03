@@ -36,7 +36,8 @@ struct CaffeinatePanel: View {
             HStack {
                 TimeoutPicker(
                     selectedTimeout: $viewModel.selectedTimeout,
-                    customSeconds: $viewModel.customTimeoutSeconds
+                    customSeconds: $viewModel.customTimeoutSeconds,
+                    scheduledDate: $viewModel.scheduledDate
                 )
                 Spacer()
                 if viewModel.isActive, viewModel.remainingSeconds > 0 {

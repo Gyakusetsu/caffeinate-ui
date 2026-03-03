@@ -18,6 +18,13 @@ final class CaffeinateViewModel {
             if isActive { syncProcess() }
         }
     }
+    var scheduledDate: Date = Date().addingTimeInterval(3600) {
+        didSet {
+            guard !isRestoring else { return }
+            saveState()
+            if isActive { syncProcess() }
+        }
+    }
     var remainingSeconds: Int = 0
     private(set) var totalTimeoutSeconds: Int = 0
     private(set) var timeoutStartDate: Date?
@@ -49,6 +56,7 @@ final class CaffeinateViewModel {
         static let enabledFlags = "enabledFlags"
         static let selectedTimeout = "selectedTimeout"
         static let customTimeoutSeconds = "customTimeoutSeconds"
+        static let scheduledDate = "scheduledDate"
     }
 
     var iconName: String {
@@ -63,7 +71,7 @@ final class CaffeinateViewModel {
         let flags = activeFlags
         guard !flags.isEmpty else { return nil }
         var parts = ["caffeinate"] + flags.map(\.rawValue)
-        if let timeout = resolveTimeout(flags: flags) {
+        if let timeout = selectedTimeout.seconds(customSeconds: customTimeoutSeconds, scheduledDate: scheduledDate) {
             parts += ["-t", "\(timeout)"]
         }
         return parts.joined(separator: " ")
@@ -141,6 +149,7 @@ final class CaffeinateViewModel {
         }
         defaults.set(selectedTimeout.rawValue, forKey: Keys.selectedTimeout)
         defaults.set(customTimeoutSeconds, forKey: Keys.customTimeoutSeconds)
+        defaults.set(scheduledDate.timeIntervalSince1970, forKey: Keys.scheduledDate)
     }
 
     private func restoreState() {
@@ -162,6 +171,11 @@ final class CaffeinateViewModel {
         let saved = defaults.integer(forKey: Keys.customTimeoutSeconds)
         if saved > 0 {
             customTimeoutSeconds = saved
+        }
+
+        let savedDate = defaults.double(forKey: Keys.scheduledDate)
+        if savedDate > 0 {
+            scheduledDate = Date(timeIntervalSince1970: savedDate)
         }
     }
 
@@ -200,7 +214,7 @@ final class CaffeinateViewModel {
     }
 
     private func resolveTimeout(flags: [CaffeinateFlag]) -> Int? {
-        selectedTimeout.seconds(customSeconds: customTimeoutSeconds)
+        selectedTimeout.seconds(customSeconds: customTimeoutSeconds, scheduledDate: scheduledDate)
     }
 
     private func startCountdown() {

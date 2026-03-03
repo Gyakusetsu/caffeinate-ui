@@ -20,7 +20,7 @@ Caffeinate UI puts all of that in a single menu bar popover: pick your flags, se
 - **Enable All** — Master toggle to enable/disable all flags at once
 - **Persistent state** — Toggles and timeout settings are remembered across app launches
 - **Launch at Login** — Option to start the app automatically at login via SMAppService
-- **Timeout picker** — Preset durations (15m, 30m, 1h, 2h, 8h, 12h), custom h:m:s input, or indefinite
+- **Timeout picker** — Preset durations (15m, 30m, 1h, 2h, 8h, 12h), custom h:m:s input, scheduled date/time, or indefinite
 - **Live countdown** — Shows remaining time next to the timeout picker
 - **Command display** — Shows the exact `caffeinate` command being run (including the hidden 8-hour cap for `-u` + indefinite)
 - **Draining cup icon** — Menu bar icon fills when active and drains from bottom-up as the timeout counts down
@@ -70,7 +70,7 @@ Sources/
 │   ├── CaffeinateUIApp.swift           # App struct, MenuBarExtra scene
 │   ├── Models/
 │   │   ├── CaffeinateFlag.swift        # Enum: -d, -i, -s, -u
-│   │   └── TimeoutOption.swift         # Enum: presets + custom + indefinite
+│   │   └── TimeoutOption.swift         # Enum: presets + custom + scheduled + indefinite
 │   ├── Services/
 │   │   ├── CaffeinateService.swift     # Protocol + impl: spawns/kills caffeinate
 │   │   └── UserDefaultsProtocol.swift  # Protocol for testable UserDefaults access

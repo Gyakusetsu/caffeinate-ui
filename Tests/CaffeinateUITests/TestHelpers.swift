@@ -48,4 +48,12 @@ final class MockUserDefaults: UserDefaultsProtocol {
     func set(_ value: Int, forKey key: String) {
         store[key] = value
     }
+
+    func double(forKey key: String) -> Double {
+        store[key] as? Double ?? 0
+    }
+
+    func set(_ value: Double, forKey key: String) {
+        store[key] = value
+    }
 }

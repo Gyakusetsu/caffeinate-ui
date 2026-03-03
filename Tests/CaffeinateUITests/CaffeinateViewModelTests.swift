@@ -155,6 +155,42 @@ final class CaffeinateViewModelTests: XCTestCase {
         XCTAssertEqual(mock.lastStartTimeout, 999)
     }
 
+    // MARK: - Scheduled timeout
+
+    func testScheduledTimeoutPassesComputedSecondsToService() {
+        vm.selectedTimeout = .scheduled
+        vm.scheduledDate = Date().addingTimeInterval(3600)
+        let binding = vm.binding(for: .preventDisplaySleep)
+        binding.wrappedValue = true
+
+        XCTAssertNotNil(mock.lastStartTimeout)
+        XCTAssertEqual(mock.lastStartTimeout!, 3600, accuracy: 2)
+    }
+
+    func testChangingScheduledDateWhileActiveResyncs() {
+        vm.selectedTimeout = .scheduled
+        vm.scheduledDate = Date().addingTimeInterval(3600)
+        let binding = vm.binding(for: .preventDisplaySleep)
+        binding.wrappedValue = true
+        let callsBefore = mock.startCallCount
+
+        vm.scheduledDate = Date().addingTimeInterval(7200)
+
+        XCTAssertEqual(mock.startCallCount, callsBefore + 1)
+        XCTAssertNotNil(mock.lastStartTimeout)
+        XCTAssertEqual(mock.lastStartTimeout!, 7200, accuracy: 2)
+    }
+
+    func testScheduledCommandStringIncludesTimeout() {
+        vm.selectedTimeout = .scheduled
+        vm.scheduledDate = Date().addingTimeInterval(3600)
+        vm.enabledFlags = [.preventDisplaySleep: true]
+
+        let command = vm.commandString
+        XCTAssertNotNil(command)
+        XCTAssertTrue(command!.contains("-t"))
+    }
+
     // MARK: - Termination callback
 
     func testTerminationCallbackResetsIsActive() {
