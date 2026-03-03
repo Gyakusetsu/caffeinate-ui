@@ -57,3 +57,13 @@ final class MockUserDefaults: UserDefaultsProtocol {
         store[key] = value
     }
 }
+
+final class MockUpdateCheckerService: UpdateCheckerServiceProtocol {
+    var stubbedStatus: UpdateStatus = .unknown
+    var checkCallCount = 0
+
+    func checkForUpdate() async -> UpdateStatus {
+        checkCallCount += 1
+        return stubbedStatus
+    }
+}

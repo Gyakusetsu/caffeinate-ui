@@ -8,7 +8,7 @@ final class PersistenceTests: XCTestCase {
     func testSavesEnabledFlagsOnToggle() {
         let defaults = MockUserDefaults()
         let mock = MockCaffeinateService()
-        let vm = CaffeinateViewModel(service: mock, defaults: defaults)
+        let vm = CaffeinateViewModel(service: mock, defaults: defaults, updateChecker: MockUpdateCheckerService())
 
         let binding = vm.binding(for: .preventDisplaySleep)
         binding.wrappedValue = true
@@ -22,7 +22,7 @@ final class PersistenceTests: XCTestCase {
     func testSavesSelectedTimeoutOnChange() {
         let defaults = MockUserDefaults()
         let mock = MockCaffeinateService()
-        let vm = CaffeinateViewModel(service: mock, defaults: defaults)
+        let vm = CaffeinateViewModel(service: mock, defaults: defaults, updateChecker: MockUpdateCheckerService())
 
         vm.selectedTimeout = .hours2
 
@@ -32,7 +32,7 @@ final class PersistenceTests: XCTestCase {
     func testSavesCustomTimeoutSecondsOnChange() {
         let defaults = MockUserDefaults()
         let mock = MockCaffeinateService()
-        let vm = CaffeinateViewModel(service: mock, defaults: defaults)
+        let vm = CaffeinateViewModel(service: mock, defaults: defaults, updateChecker: MockUpdateCheckerService())
 
         vm.customTimeoutSeconds = 1234
 
@@ -51,7 +51,7 @@ final class PersistenceTests: XCTestCase {
         defaults.set(999, forKey: "customTimeoutSeconds")
 
         let mock = MockCaffeinateService()
-        let vm = CaffeinateViewModel(service: mock, defaults: defaults)
+        let vm = CaffeinateViewModel(service: mock, defaults: defaults, updateChecker: MockUpdateCheckerService())
 
         XCTAssertTrue(vm.enabledFlags[.preventDisplaySleep] == true)
         XCTAssertTrue(vm.enabledFlags[.preventIdleSleep] == true)
@@ -65,7 +65,7 @@ final class PersistenceTests: XCTestCase {
         defaults.set(flagData, forKey: "enabledFlags")
 
         let mock = MockCaffeinateService()
-        let vm = CaffeinateViewModel(service: mock, defaults: defaults)
+        let vm = CaffeinateViewModel(service: mock, defaults: defaults, updateChecker: MockUpdateCheckerService())
 
         XCTAssertTrue(vm.isActive)
         XCTAssertEqual(mock.startCallCount, 1)
@@ -77,7 +77,7 @@ final class PersistenceTests: XCTestCase {
     func testStopAllClearsPersistedFlags() {
         let defaults = MockUserDefaults()
         let mock = MockCaffeinateService()
-        let vm = CaffeinateViewModel(service: mock, defaults: defaults)
+        let vm = CaffeinateViewModel(service: mock, defaults: defaults, updateChecker: MockUpdateCheckerService())
 
         let binding = vm.binding(for: .preventDisplaySleep)
         binding.wrappedValue = true
@@ -95,7 +95,7 @@ final class PersistenceTests: XCTestCase {
     func testSavesScheduledDateOnChange() {
         let defaults = MockUserDefaults()
         let mock = MockCaffeinateService()
-        let vm = CaffeinateViewModel(service: mock, defaults: defaults)
+        let vm = CaffeinateViewModel(service: mock, defaults: defaults, updateChecker: MockUpdateCheckerService())
 
         let futureDate = Date().addingTimeInterval(7200)
         vm.scheduledDate = futureDate
@@ -110,7 +110,7 @@ final class PersistenceTests: XCTestCase {
         defaults.set(futureDate.timeIntervalSince1970, forKey: "scheduledDate")
 
         let mock = MockCaffeinateService()
-        let vm = CaffeinateViewModel(service: mock, defaults: defaults)
+        let vm = CaffeinateViewModel(service: mock, defaults: defaults, updateChecker: MockUpdateCheckerService())
 
         XCTAssertEqual(vm.scheduledDate.timeIntervalSince1970, futureDate.timeIntervalSince1970, accuracy: 0.001)
     }
@@ -124,7 +124,7 @@ final class PersistenceTests: XCTestCase {
         defaults.set(0, forKey: "customTimeoutSeconds")
 
         let mock = MockCaffeinateService()
-        let vm = CaffeinateViewModel(service: mock, defaults: defaults)
+        let vm = CaffeinateViewModel(service: mock, defaults: defaults, updateChecker: MockUpdateCheckerService())
 
         // Falls back to defaults
         XCTAssertTrue(vm.activeFlags.isEmpty)

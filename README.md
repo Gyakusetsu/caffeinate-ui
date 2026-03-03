@@ -28,6 +28,7 @@ Caffeinate UI puts all of that in a single menu bar popover: pick your flags, se
 - **Single instance** — Only one instance can run at a time (POSIX file lock)
 - **Clean startup** — Kills any stale caffeinate processes from previous sessions
 - **Graceful cleanup** — Terminates caffeinate when the app quits
+- **Update checker** — Checks GitHub Releases on launch; shows a green dot (up to date) or orange dot (update available, click to open releases page) next to the version number in the footer
 
 ## Install
 
@@ -70,9 +71,11 @@ Sources/
 │   ├── CaffeinateUIApp.swift           # App struct, MenuBarExtra scene
 │   ├── Models/
 │   │   ├── CaffeinateFlag.swift        # Enum: -d, -i, -s, -u
+│   │   ├── SemanticVersion.swift       # Version parsing + Comparable
 │   │   └── TimeoutOption.swift         # Enum: presets + custom + scheduled + indefinite
 │   ├── Services/
 │   │   ├── CaffeinateService.swift     # Protocol + impl: spawns/kills caffeinate
+│   │   ├── UpdateCheckerService.swift  # GitHub Releases API update checker
 │   │   └── UserDefaultsProtocol.swift  # Protocol for testable UserDefaults access
 │   ├── ViewModels/
 │   │   └── CaffeinateViewModel.swift   # @Observable state management
@@ -91,7 +94,8 @@ Tests/CaffeinateUITests/
 ├── PersistenceTests.swift
 ├── TestHelpers.swift
 ├── TimeFormattingTests.swift
-└── TimeoutOptionTests.swift
+├── TimeoutOptionTests.swift
+└── UpdateCheckerTests.swift
 ```
 
 ## Made by

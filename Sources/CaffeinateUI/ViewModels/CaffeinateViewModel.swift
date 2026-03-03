@@ -30,6 +30,11 @@ final class CaffeinateViewModel {
     private(set) var timeoutStartDate: Date?
     private(set) var timeoutProgress: Double = 0
     private(set) var isActive: Bool = false
+    private(set) var updateStatus: UpdateStatus = .unknown
+
+    var currentVersion: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?"
+    }
 
     var launchAtLogin: Bool = SMAppService.mainApp.status == .enabled {
         didSet {
@@ -49,8 +54,10 @@ final class CaffeinateViewModel {
 
     private let service: CaffeinateServiceProtocol
     private let defaults: UserDefaultsProtocol
+    private let updateChecker: UpdateCheckerServiceProtocol
     private var countdownTimer: Timer?
     private var isRestoring = false
+    private var lastUpdateCheck: Date?
 
     private enum Keys {
         static let enabledFlags = "enabledFlags"
@@ -79,10 +86,12 @@ final class CaffeinateViewModel {
 
     init(
         service: CaffeinateServiceProtocol = CaffeinateService(),
-        defaults: UserDefaultsProtocol = UserDefaults.standard
+        defaults: UserDefaultsProtocol = UserDefaults.standard,
+        updateChecker: UpdateCheckerServiceProtocol = UpdateCheckerService()
     ) {
         self.service = service
         self.defaults = defaults
+        self.updateChecker = updateChecker
         service.killAll()
 
         service.onTermination = { [weak self] in
@@ -106,6 +115,23 @@ final class CaffeinateViewModel {
 
         restoreState()
         syncProcess()
+
+        Task { [weak self] in
+            await self?.checkForUpdate()
+        }
+    }
+
+    func checkForUpdate() async {
+        if let last = lastUpdateCheck,
+           Date().timeIntervalSince(last) < 86400 {
+            return
+        }
+
+        let status = await updateChecker.checkForUpdate()
+        await MainActor.run {
+            self.updateStatus = status
+            self.lastUpdateCheck = Date()
+        }
     }
 
     func binding(for flag: CaffeinateFlag) -> Binding<Bool> {

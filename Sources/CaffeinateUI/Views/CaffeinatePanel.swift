@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 struct CaffeinatePanel: View {
@@ -75,16 +76,69 @@ struct CaffeinatePanel: View {
 
             Divider()
 
-            HStack(spacing: 4) {
-                Text("Made by Reymar &")
-                Image(systemName: "sparkles")
-                Text("Claude")
+            HStack {
+                HStack(spacing: 4) {
+                    Text("Made by Reymar &")
+                    Image(systemName: "sparkles")
+                    Text("Claude")
+                }
+                .foregroundStyle(.secondary)
+
+                Spacer()
+
+                VersionLabel(
+                    version: viewModel.currentVersion,
+                    status: viewModel.updateStatus
+                )
             }
             .font(.caption)
-            .foregroundStyle(.secondary)
-            .frame(maxWidth: .infinity, alignment: .center)
         }
         .padding()
         .frame(width: 340)
+    }
+}
+
+private struct VersionLabel: View {
+    let version: String
+    let status: UpdateStatus
+    @State private var isHovering = false
+
+    var body: some View {
+        switch status {
+        case .unknown:
+            Text("v\(version)")
+                .foregroundStyle(.secondary)
+
+        case .upToDate:
+            HStack(spacing: 4) {
+                Circle()
+                    .fill(.green)
+                    .frame(width: 6, height: 6)
+                Text("v\(version)")
+                    .foregroundStyle(.secondary)
+            }
+            .help("Up to date")
+
+        case .updateAvailable(let latestVersion, let url):
+            HStack(spacing: 4) {
+                Circle()
+                    .fill(.orange)
+                    .frame(width: 6, height: 6)
+                Text("v\(version)")
+                    .foregroundStyle(.orange)
+            }
+            .help("Update available: \(latestVersion)")
+            .onTapGesture {
+                NSWorkspace.shared.open(url)
+            }
+            .onHover { hovering in
+                isHovering = hovering
+                if hovering {
+                    NSCursor.pointingHand.push()
+                } else {
+                    NSCursor.pop()
+                }
+            }
+        }
     }
 }

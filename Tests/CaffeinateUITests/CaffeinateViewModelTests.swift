@@ -8,7 +8,7 @@ final class CaffeinateViewModelTests: XCTestCase {
     override func setUp() {
         super.setUp()
         mock = MockCaffeinateService()
-        vm = CaffeinateViewModel(service: mock, defaults: MockUserDefaults())
+        vm = CaffeinateViewModel(service: mock, defaults: MockUserDefaults(), updateChecker: MockUpdateCheckerService())
     }
 
     // MARK: - activeFlags
